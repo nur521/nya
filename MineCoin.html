@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App</title>
+</head>
+<body>
+    <h1>Привет, <span id="username"></span>!</h1>
+    <p>Ваш баланс: <span id="balance"></span> токенов</p>
+    <p>Вы пригласили: <span id="referrals_count"></span> человек</p>
+    <p>Ваша реферальная ссылка: <span id="referral_link"></span></p>
+    <p>Осталось токенов: <span id="remaining_tokens"></span></p>
+    
+    <!-- Форма для добавления TON кошелька -->
+    <form id="wallet_form" method="POST" action="save_wallet.php">
+        <label for="wallet">Введите ваш TON кошелек:</label>
+        <input type="text" id="wallet" name="wallet" required>
+        <button type="submit">Сохранить кошелек</button>
+    </form>
+
+    <script>
+        // Получение данных о юзере из Telegram Web App
+        window.Telegram.WebApp.onEvent('user', function(user) {
+            document.getElementById('username').textContent = user.username;
+
+            // Запрос на сервер для получения информации о пользователе
+            fetch(`get_user_data.php?telegram_id=${user.id}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('balance').textContent = data.balance;
+                    document.getElementById('referrals_count').textContent = data.referrals_count;
+                    document.getElementById('referral_link').textContent = data.referral_link;
+                    document.getElementById('remaining_tokens').textContent = data.remaining_tokens;
+                });
+        });
+
+        Telegram.WebApp.ready();
+    </script>
+</body>
+</html>
